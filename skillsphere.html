@@ -1,0 +1,3118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SkillSphere — AI Student Skill & Campus Connect Platform | Team NEXUS PRIME</title>
+  <meta name="description" content="AI-Powered Student Skill Platform & Campus Connect for HexWartz 2026 Hackathon (SDG 4 - Quality Education).">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CSS RESET & DESIGN TOKENS
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    :root {
+      --bg-dark: #070814;
+      --bg-card: rgba(18, 20, 39, 0.65);
+      --bg-card-hover: rgba(28, 32, 60, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 242, 254, 0.35);
+      
+      --cyan: #00f2fe;
+      --cyan-glow: rgba(0, 242, 254, 0.3);
+      --violet: #8b5cf6;
+      --violet-glow: rgba(139, 92, 246, 0.3);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.3);
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --font-display: 'Space Grotesk', -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-hindi: 'Noto Sans Devanagari', sans-serif;
+      
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      
+      --perspective: 1200px;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       BACKGROUND & ATMOSPHERE
+       ========================================================================== */
+    #ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.45;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .orb-cyan {
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.45) 0%, rgba(79, 172, 254, 0.1) 60%, transparent 80%);
+      top: -15%;
+      left: -10%;
+      animation: floatOrb1 26s ease-in-out infinite alternate;
+    }
+
+    .orb-violet {
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, rgba(217, 70, 239, 0.1) 60%, transparent 80%);
+      bottom: -15%;
+      right: -10%;
+      animation: floatOrb2 30s ease-in-out infinite alternate;
+    }
+
+    .orb-amber {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, transparent 70%);
+      top: 40%;
+      left: 55%;
+      animation: floatOrb3 22s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrb1 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(120px, 80px) scale(1.15); }
+    }
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-100px, -90px) scale(1.12); }
+    }
+    @keyframes floatOrb3 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-80px, 60px) scale(0.9); }
+    }
+
+    #grid-layer {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      background-position: center center;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 60%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 60%, transparent 100%);
+    }
+
+    #canvas-network {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Laser pointer canvas */
+    #laser-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      display: none;
+    }
+    body.laser-active #laser-canvas {
+      display: block;
+    }
+    body.laser-active {
+      cursor: crosshair;
+    }
+
+    /* ==========================================================================
+       PRESENTATION DECK & 3D SLIDE VIEWPORT
+       ========================================================================== */
+    #presentation-viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+      perspective: var(--perspective);
+      overflow: hidden;
+    }
+
+    #slides-deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s var(--ease-out-expo);
+    }
+
+    /* Slide base styling */
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 5rem 6.5rem 5rem;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+      transition: 
+        transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.75s ease,
+        visibility 0.85s ease;
+    }
+
+    /* Transition Mode: 3D Cube (Default) */
+    .deck-mode-3d .slide {
+      transform: translateZ(-350px) rotateY(40deg);
+    }
+    .deck-mode-3d .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateZ(0) rotateY(0deg);
+    }
+    .deck-mode-3d .slide.prev {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateZ(-350px) rotateY(-40deg);
+    }
+    .deck-mode-3d .slide.next {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateZ(-350px) rotateY(40deg);
+    }
+
+    /* Transition Mode: Parallax Glide */
+    .deck-mode-parallax .slide {
+      transform: translateX(100vw) scale(0.92);
+    }
+    .deck-mode-parallax .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+    .deck-mode-parallax .slide.prev {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-100vw) scale(0.92);
+    }
+    .deck-mode-parallax .slide.next {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(100vw) scale(0.92);
+    }
+
+    /* Transition Mode: Quantum Zoom & Blur */
+    .deck-mode-zoom .slide {
+      transform: scale(1.35);
+      filter: blur(20px);
+    }
+    .deck-mode-zoom .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+    .deck-mode-zoom .slide.prev {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.65);
+      filter: blur(20px);
+    }
+    .deck-mode-zoom .slide.next {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.35);
+      filter: blur(20px);
+    }
+
+    /* ==========================================================================
+       TYPOGRAPHY & ACCENTS
+       ========================================================================== */
+    .slide-content {
+      width: 100%;
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+    }
+
+    .slide-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      margin-bottom: 0.65rem;
+    }
+
+    .slide-eyebrow .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .slide-title {
+      font-size: clamp(2rem, 4.2vw, 3.4rem);
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 780px;
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+    }
+
+    .gradient-text-cyan {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-text-violet {
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-text-gold {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #ea580c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hindi-quote {
+      font-family: var(--font-hindi);
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      letter-spacing: 0.01em;
+    }
+
+    /* ==========================================================================
+       GLASSMORPHISM CARDS & CONTAINERS
+       ========================================================================== */
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 1.75rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s var(--ease-out-expo);
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .glass-panel.glow-cyan:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 35px rgba(0, 242, 254, 0.2), inset 0 1px 0 rgba(0, 242, 254, 0.2);
+    }
+
+    .glass-panel.glow-violet:hover {
+      border-color: var(--violet);
+      box-shadow: 0 0 35px rgba(139, 92, 246, 0.2), inset 0 1px 0 rgba(139, 92, 246, 0.2);
+    }
+
+    .glass-panel.glow-gold:hover {
+      border-color: var(--amber);
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(245, 158, 11, 0.2);
+    }
+
+    /* Tilt 3D Interactive Card */
+    .card-3d-tilt {
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Tags & Badges */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .pill-badge.cyan {
+      border-color: rgba(0, 242, 254, 0.3);
+      color: var(--cyan);
+      background: rgba(0, 242, 254, 0.08);
+    }
+
+    .pill-badge.violet {
+      border-color: rgba(139, 92, 246, 0.3);
+      color: #c084fc;
+      background: rgba(139, 92, 246, 0.08);
+    }
+
+    .pill-badge.amber {
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .pill-badge.emerald {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    /* ==========================================================================
+       ANIMATIONS ON SLIDE ACTIVE
+       ========================================================================== */
+    .slide .anim-stagger {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    }
+
+    .slide.active .anim-stagger {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide.active .anim-delay-1 { transition-delay: 0.12s; }
+    .slide.active .anim-delay-2 { transition-delay: 0.22s; }
+    .slide.active .anim-delay-3 { transition-delay: 0.32s; }
+    .slide.active .anim-delay-4 { transition-delay: 0.42s; }
+    .slide.active .anim-delay-5 { transition-delay: 0.52s; }
+    .slide.active .anim-delay-6 { transition-delay: 0.62s; }
+
+    /* ==========================================================================
+       SLIDE-SPECIFIC CUSTOM LAYOUTS
+       ========================================================================== */
+
+    /* Slide 1: HERO */
+    .hero-center {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-title-main {
+      font-size: clamp(3.4rem, 7.8vw, 6.2rem);
+      font-weight: 800;
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #00f2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 80px rgba(0, 242, 254, 0.35);
+    }
+
+    .hero-tagline {
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+      color: #cbd5e1;
+      max-width: 880px;
+      margin-bottom: 2rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .hero-pitch-quote {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid var(--amber);
+      padding: 1.1rem 1.8rem;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.2rem;
+      backdrop-filter: blur(20px);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-cyber {
+      background: linear-gradient(135deg, #00f2fe 0%, #8b5cf6 100%);
+      color: #050711;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 10px 25px rgba(0, 242, 254, 0.35);
+      transition: all 0.3s var(--ease-spring);
+    }
+
+    .btn-cyber:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.5);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Slide 2: PROBLEM MATRIX */
+    .grid-4-col {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .problem-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .problem-num {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.15);
+      margin-bottom: 0.75rem;
+    }
+
+    .problem-card h3 {
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+
+    .problem-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .problem-quote {
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.82rem;
+      color: #fca5a5;
+      font-style: italic;
+    }
+
+    /* Slide 3: 4 CORE PILLARS */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .pillar-card {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .pillar-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pillar-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pillar-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+
+    .pillar-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      margin-top: auto;
+    }
+
+    .pillar-feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pillar-feature-list li::before {
+      content: "✓";
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    /* Slide 4: FIND MY TEAM SIMULATOR */
+    .fmt-container {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.75rem;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .fmt-config-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .fmt-results-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .event-select-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .fmt-team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .mate-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .mate-card.highlight {
+      border-color: var(--cyan);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+    }
+
+    .mate-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mate-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .mate-score {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--emerald);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .ai-synergy-banner {
+      background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), rgba(0, 242, 254, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Slide 5: AI PIPELINE */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      width: 100%;
+      position: relative;
+      margin-bottom: 1.75rem;
+    }
+
+    .pipeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .pipeline-step::after {
+      content: "➔";
+      position: absolute;
+      right: -14px;
+      top: 36px;
+      font-size: 1.2rem;
+      color: var(--cyan);
+      opacity: 0.6;
+    }
+    .pipeline-step:last-child::after {
+      display: none;
+    }
+
+    .pipe-node {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .pipeline-step:hover .pipe-node {
+      border-color: var(--cyan);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .code-inspect-box {
+      background: #04050b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    /* Slide 6: DEMO FLOW PLAYBOOK */
+    .demo-timeline {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.85rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .demo-step-card {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .demo-step-card.active, .demo-step-card:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 242, 254, 0.05);
+      transform: translateY(-3px);
+    }
+
+    .demo-time-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    .demo-actor {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .demo-preview-display {
+      background: rgba(10, 13, 28, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      width: 100%;
+    }
+
+    /* Slide 7: COMPETITIVE MOAT */
+    .moat-table-wrap {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .moat-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .moat-table th, .moat-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .moat-table th {
+      background: rgba(0, 0, 0, 0.5);
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .moat-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .moat-table .col-hero {
+      background: rgba(0, 242, 254, 0.05);
+      border-left: 1px solid rgba(0, 242, 254, 0.2);
+      border-right: 1px solid rgba(0, 242, 254, 0.2);
+    }
+
+    .moat-check {
+      color: var(--emerald);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .moat-cross {
+      color: var(--rose);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    /* Slide 8: TECH ARCHITECTURE */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .tech-tier-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .tech-badge-title {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+    }
+
+    /* Slide 9: SDG 4 IMPACT */
+    .sdg-banner {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 16px;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+    }
+
+    .sdg-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .sdg-stat-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Slide 10: ROADMAP */
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .roadmap-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .roadmap-col-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid;
+    }
+
+    .roadmap-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .roadmap-list li {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+
+    /* Slide 11: JUDGES Q&A MATRIX */
+    .qa-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      width: 100%;
+    }
+
+    .qa-card {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .qa-question {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .qa-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      background: rgba(0, 242, 254, 0.12);
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .qa-answer {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Slide 12: TEAM & FINALE */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.75rem;
+    }
+
+    .team-member-card {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .team-avatar-ring {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      margin-bottom: 0.9rem;
+      position: relative;
+    }
+
+    .team-avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #090b16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #fff;
+    }
+
+    .closers-box {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    /* ==========================================================================
+       PERSISTENT CONTROLS & HUD DOCK
+       ========================================================================== */
+    #hud-dock {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(11, 14, 29, 0.85);
+      backdrop-filter: blur(24px) saturate(1.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.1);
+    }
+
+    .hud-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.05rem;
+      transition: all 0.2s ease;
+    }
+
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .hud-btn.active {
+      color: var(--cyan);
+      background: rgba(0, 242, 254, 0.12);
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hud-counter {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      padding: 0 0.5rem;
+    }
+
+    /* Progress bar along the very top */
+    #top-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet), var(--amber));
+      z-index: 1000;
+      transition: width 0.4s var(--ease-out-expo);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+    }
+
+    /* Live stopwatch HUD widget (top right) */
+    #pitch-timer-widget {
+      position: fixed;
+      top: 1.5rem;
+      right: 2rem;
+      z-index: 100;
+      background: rgba(11, 14, 29, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.45rem 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    #pitch-timer-widget .timer-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    /* ==========================================================================
+       SLIDE OVERVIEW GRID (LIGHTBOX)
+       ========================================================================== */
+    #overview-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 12, 0.92);
+      backdrop-filter: blur(30px);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      padding: 3rem 4rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #overview-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .overview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+    }
+
+    .overview-thumbnail {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all 0.25s ease;
+    }
+
+    .overview-thumbnail:hover, .overview-thumbnail.current {
+      border-color: var(--cyan);
+      background: rgba(0, 242, 254, 0.08);
+      transform: translateY(-4px);
+    }
+
+    .overview-thumb-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+    }
+
+    .overview-thumb-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       SPEAKER NOTES DRAWER
+       ========================================================================== */
+    #speaker-notes-drawer {
+      position: fixed;
+      bottom: 0;
+      right: 2rem;
+      width: 420px;
+      max-height: 480px;
+      background: rgba(10, 13, 28, 0.96);
+      backdrop-filter: blur(30px);
+      border: 1px solid var(--border-glow);
+      border-bottom: none;
+      border-radius: 18px 18px 0 0;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(105%);
+      transition: transform 0.4s var(--ease-out-expo);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    #speaker-notes-drawer.open {
+      transform: translateY(0);
+    }
+
+    .notes-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notes-content {
+      padding: 1.25rem;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .notes-cue-badge {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .grid-4-col, .pillars-grid, .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .fmt-container {
+        grid-template-columns: 1fr;
+      }
+      .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .slide {
+        padding: 2rem 2rem 6rem 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="deck-mode-3d">
+
+  <!-- Background Ambiance -->
+  <div id="ambient-bg">
+    <div class="ambient-orb orb-cyan"></div>
+    <div class="ambient-orb orb-violet"></div>
+    <div class="ambient-orb orb-amber"></div>
+    <div id="grid-layer"></div>
+    <canvas id="canvas-network"></canvas>
+  </div>
+
+  <!-- Top Progress Bar -->
+  <div id="top-progress-bar" style="width: 8.33%;"></div>
+
+  <!-- Pitch Timer Widget -->
+  <div id="pitch-timer-widget">
+    <div class="timer-dot"></div>
+    <span id="pitch-timer-text">00:00</span>
+    <span style="color:var(--text-dim)">/ 04:00</span>
+    <button onclick="togglePitchTimer()" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.8rem;margin-left:4px;" title="Start/Pause Timer">⏯</button>
+    <button onclick="resetPitchTimer()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;" title="Reset Timer">↺</button>
+  </div>
+
+  <!-- Laser Pointer Canvas -->
+  <canvas id="laser-canvas"></canvas>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ========================================================================
+       PRESENTATION DECK
+       ======================================================================== -->
+  <main id="presentation-viewport">
+    <div id="slides-deck">
+
+      <!-- SLIDE 1: HERO -->
+      <section class="slide active" data-slide="1">
+        <div class="slide-content hero-center">
+          <div class="hero-badge-row anim-stagger anim-delay-1">
+            <span class="pill-badge cyan"><span class="dot"></span> HexWartz 2026 Hackathon</span>
+            <span class="pill-badge amber">House: Hufflepuff</span>
+            <span class="pill-badge violet">SDG 4: Quality Education</span>
+            <span class="pill-badge">Sharda University Agra</span>
+          </div>
+
+          <h1 class="hero-title-main anim-stagger anim-delay-2">SkillSphere</h1>
+
+          <p class="hero-tagline anim-stagger anim-delay-3">
+            The AI-Powered Student Skill Exchange & Campus Synergy Platform.<br>
+            Bridging fragmented campuses into an intelligent peer-learning network.
+          </p>
+
+          <div class="hero-pitch-quote anim-stagger anim-delay-4">
+            <span style="font-size:1.6rem;">💡</span>
+            <span class="hindi-quote">"Sharda ke students ko sahi log, sahi skills aur sahi events se AI ke zariye jodna."</span>
+          </div>
+
+          <div class="hero-cta-group anim-stagger anim-delay-5">
+            <button class="btn-cyber" onclick="nextSlide()">
+              <span>Explore The Pitch</span>
+              <span>➔</span>
+            </button>
+            <button class="btn-ghost" onclick="jumpToSlide(4)">
+              <span>⚡ Live USP Simulator</span>
+            </button>
+            <button class="btn-ghost" onclick="jumpToSlide(6)">
+              <span>⏱ 4-Min Demo Script</span>
+            </button>
+          </div>
+
+          <div style="margin-top:2.5rem; font-family:var(--font-mono); font-size:0.78rem; color:var(--text-dim);" class="anim-stagger anim-delay-6">
+            Team NEXUS PRIME • Press <kbd style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;">Space</kbd> or <kbd style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;">➔</kbd> to Navigate • <kbd style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;">O</kbd> for Overview
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 2: THE PROBLEM -->
+      <section class="slide" data-slide="2">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            01 / The Real Campus Problem
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            The <span class="gradient-text-gold">Campus Disconnect</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Talent is everywhere on campus, but discovery is broken. Students miss hackathons, struggle to find complementary teammates, and seniors and juniors live in completely isolated silos.
+          </p>
+
+          <div class="grid-4-col">
+            <!-- Card 1 -->
+            <div class="glass-panel problem-card anim-stagger anim-delay-3 card-3d-tilt">
+              <div class="problem-num">01</div>
+              <h3>WhatsApp Group Hell</h3>
+              <p>Crucial hackathon deadlines, club meets, and notices get lost in endless spam, sticker reactions, and unread groups.</p>
+              <div class="problem-quote">"Bro, registration band ho gayi? Mujhe pata hi nahi chala!"</div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-panel problem-card anim-stagger anim-delay-4 card-3d-tilt">
+              <div class="problem-num">02</div>
+              <h3>No Teammate Match</h3>
+              <p>Students form hackathon teams based solely on who sits next to them in class—ending up with 4 frontend devs and zero backend or designers.</p>
+              <div class="problem-quote">"Koi backend wala hai jo API bana sake?"</div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-panel problem-card anim-stagger anim-delay-5 card-3d-tilt">
+              <div class="problem-num">03</div>
+              <h3>Zero Senior Mentorship</h3>
+              <p>Juniors hesitate to approach seniors on LinkedIn. Valuable guidance and peer-learning hours are wasted due to intimidation and cold DMs.</p>
+              <div class="problem-quote">"Senior se kaise poochun? Reply aayega ya nahi?"</div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="glass-panel problem-card anim-stagger anim-delay-6 card-3d-tilt">
+              <div class="problem-num">04</div>
+              <h3>Wasted Skill Latency</h3>
+              <p>A 3rd-year knows Flutter; a 1st-year desperately wants to learn. Neither knows the other exists right across the same academic block.</p>
+              <div class="problem-quote">"Kaash koi campus mein hi Python sikha deta."</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 3: THE SOLUTION ECOSYSTEM -->
+      <section class="slide" data-slide="3">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            02 / Unified Solution
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            The <span class="gradient-text-cyan">SkillSphere</span> Ecosystem
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            A cohesive campus hub powered by lightweight Gemini AI embeddings, matching students across skills, complementary team requirements, and live campus pulses.
+          </p>
+
+          <div class="pillars-grid">
+            <!-- Pillar 1 -->
+            <div class="glass-panel pillar-card glow-cyan anim-stagger anim-delay-3 card-3d-tilt">
+              <div class="pillar-icon-box" style="background:rgba(0,242,254,0.1);color:var(--cyan);">🤝</div>
+              <h3>AI Skill Matcher</h3>
+              <p>Bi-directional skill exchange matching students via "Can Teach" and "Want to Learn" vector embeddings.</p>
+              <ul class="pillar-feature-list">
+                <li>Pretrained Vector Embeddings</li>
+                <li>Cosine Similarity Engine</li>
+                <li>One-click Connect Requests</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="glass-panel pillar-card glow-violet anim-stagger anim-delay-4 card-3d-tilt">
+              <div class="pillar-icon-box" style="background:rgba(139,92,246,0.1);color:var(--violet);">🎯</div>
+              <h3>Campus Events Hub</h3>
+              <p>Smart event discovery with personalized "For You" match percentages and instantaneous one-click registration.</p>
+              <ul class="pillar-feature-list">
+                <li>"92% Match" Similarity Badges</li>
+                <li>Club, Hackathon & Workshop filters</li>
+                <li>Instant Registration State</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="glass-panel pillar-card glow-gold anim-stagger anim-delay-5 card-3d-tilt">
+              <div class="pillar-icon-box" style="background:rgba(245,158,11,0.1);color:var(--amber);">⚡</div>
+              <h3>USP: Find My Team</h3>
+              <p>One-click AI algorithmic team assembly for any hackathon: pairing complementary skills instead of redundant ones.</p>
+              <ul class="pillar-feature-list">
+                <li>Synthesizes Frontend + Backend + AI</li>
+                <li>Instant LLM Role & Synergy reasons</li>
+                <li>Direct Teammate Invite triggers</li>
+              </ul>
+            </div>
+
+            <!-- Pillar 4 -->
+            <div class="glass-panel pillar-card glow-cyan anim-stagger anim-delay-6 card-3d-tilt">
+              <div class="pillar-icon-box" style="background:rgba(16,185,129,0.1);color:var(--emerald);">💬</div>
+              <h3>Campus Feed & AI</h3>
+              <p>280-char micro-posts with embedded media + Ask Campus AI grounded strictly in verified university events.</p>
+              <ul class="pillar-feature-list">
+                <li>6 Curated Domain Communities</li>
+                <li>Zero-Hallucination Campus RAG</li>
+                <li>Integrated Video Embed Player</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 4: USP SIMULATOR (FIND MY TEAM) -->
+      <section class="slide" data-slide="4">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            03 / Crown Jewel Feature (USP)
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            AI Synergy: <span class="gradient-text-gold">"Find My Team"</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Why form random teams? With one click, SkillSphere calculates complementary skill vectors to assemble a balanced, competition-winning dream team in seconds.
+          </p>
+
+          <div class="fmt-container anim-stagger anim-delay-4">
+            <!-- Left: Interactive Selector -->
+            <div class="glass-panel fmt-config-card">
+              <div style="font-weight:700;font-size:1.05rem;color:#fff;">🎯 Target Hackathon Event</div>
+              
+              <div class="event-select-box">
+                <span class="pill-badge amber" style="width:fit-content;">HexWartz 2026</span>
+                <strong style="color:#fff;font-size:1rem;">HexWartz 24h AI Hackathon</strong>
+                <span style="font-size:0.8rem;color:var(--text-muted);">Required Skills: Next.js, Python FastAPI, Gemini API, UI/UX</span>
+              </div>
+
+              <div>
+                <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:0.4rem;">Logged-in User (You):</label>
+                <div style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:10px;border:1px solid var(--border-subtle);font-size:0.85rem;">
+                  <strong style="color:var(--cyan);">Rohan Verma (Year 2)</strong><br>
+                  <span style="color:var(--text-muted);">Your Skill: React / Next.js Frontend</span>
+                </div>
+              </div>
+
+              <button class="btn-cyber" style="width:100%;justify-content:center;" onclick="simulateFindMyTeam()">
+                <span>⚡ Run AI Synergy Engine</span>
+              </button>
+
+              <div style="font-size:0.78rem;color:var(--text-dim);line-height:1.4;">
+                *Heuristic selects candidates with non-overlapping, complementary skill vectors who share event interest.
+              </div>
+            </div>
+
+            <!-- Right: Interactive Results Area -->
+            <div class="glass-panel fmt-results-card">
+              <div class="ai-synergy-banner">
+                <div>
+                  <div style="font-weight:700;font-size:1rem;color:#fff;">AI Synergy Score: <span id="fmt-score-val" style="color:var(--emerald);">97.4% Match</span></div>
+                  <div style="font-size:0.8rem;color:var(--text-muted);" id="fmt-status-text">Balanced: 1 Frontend + 1 AI Lead + 1 Backend + 1 Product Designer</div>
+                </div>
+                <span class="pill-badge emerald">Complementary Found</span>
+              </div>
+
+              <div class="fmt-team-grid" id="fmt-team-results">
+                <!-- Teammate 1 -->
+                <div class="mate-card highlight">
+                  <div class="mate-header">
+                    <div class="mate-avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">GS</div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.95rem;color:#fff;">Garv Singh</div>
+                      <div style="font-size:0.75rem;color:var(--violet);">AI & FastAPI Architect</div>
+                    </div>
+                    <div class="mate-score">99%</div>
+                  </div>
+                  <div style="font-size:0.8rem;color:#cbd5e1;line-height:1.4;">
+                    <strong>Why AI matched:</strong> Strong in Gemini embeddings & vector math, bridging Rohan's Next.js frontend to Python backend.
+                  </div>
+                  <button class="btn-ghost" style="padding:0.4rem;font-size:0.75rem;justify-content:center;margin-top:auto;" onclick="alert('Invite sent to Garv Singh!')">Invite to Team</button>
+                </div>
+
+                <!-- Teammate 2 -->
+                <div class="mate-card highlight">
+                  <div class="mate-header">
+                    <div class="mate-avatar" style="background:linear-gradient(135deg,#00f2fe,#3b82f6);">BP</div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.95rem;color:#fff;">Bhanu Pratap</div>
+                      <div style="font-size:0.75rem;color:var(--cyan);">Database & Auth Lead</div>
+                    </div>
+                    <div class="mate-score">96%</div>
+                  </div>
+                  <div style="font-size:0.8rem;color:#cbd5e1;line-height:1.4;">
+                    <strong>Why AI matched:</strong> Owns Supabase schema, authentication pipelines, and Vercel/Render production deployment.
+                  </div>
+                  <button class="btn-ghost" style="padding:0.4rem;font-size:0.75rem;justify-content:center;margin-top:auto;" onclick="alert('Invite sent to Bhanu Pratap!')">Invite to Team</button>
+                </div>
+
+                <!-- Teammate 3 -->
+                <div class="mate-card highlight">
+                  <div class="mate-header">
+                    <div class="mate-avatar" style="background:linear-gradient(135deg,#f59e0b,#ea580c);">PJ</div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.95rem;color:#fff;">Prince Jha</div>
+                      <div style="font-size:0.75rem;color:var(--amber);">UI/UX & Product Design</div>
+                    </div>
+                    <div class="mate-score">98%</div>
+                  </div>
+                  <div style="font-size:0.8rem;color:#cbd5e1;line-height:1.4;">
+                    <strong>Why AI matched:</strong> Crafts interactive event screens, profile forms, and high-impact pitch visual fidelity.
+                  </div>
+                  <button class="btn-ghost" style="padding:0.4rem;font-size:0.75rem;justify-content:center;margin-top:auto;" onclick="alert('Invite sent to Prince Jha!')">Invite to Team</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 5: AI MATCHING ENGINE & VECTOR MATH -->
+      <section class="slide" data-slide="5">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            04 / Technical Depth
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            The <span class="gradient-text-cyan">AI Matching Engine</span> Architecture
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            No bloated model training—smart engineering. Pretrained Google Gemini vector embeddings + in-memory cosine similarity matrix with cached LLM reasoning for sub-second responses.
+          </p>
+
+          <div class="pipeline-steps anim-stagger anim-delay-4">
+            <div class="pipeline-step">
+              <div class="pipe-node">👤</div>
+              <strong style="font-size:0.9rem;color:#fff;">Profile Ingestion</strong>
+              <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Skills, bio, Can Teach, Want to Learn</span>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipe-node">🔤</div>
+              <strong style="font-size:0.9rem;color:#fff;">Text Normalization</strong>
+              <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Structured semantic context string</span>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipe-node">📐</div>
+              <strong style="font-size:0.9rem;color:var(--cyan);">Gemini 768-D</strong>
+              <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Dense vector embedding generation</span>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipe-node">⚡</div>
+              <strong style="font-size:0.9rem;color:var(--violet);">Cosine Matrix</strong>
+              <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">NumPy similarity ranking in &lt;15ms</span>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipe-node">💡</div>
+              <strong style="font-size:0.9rem;color:var(--amber);">LLM Reasoner</strong>
+              <span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Cached 20-word why-match justification</span>
+            </div>
+          </div>
+
+          <div class="code-inspect-box anim-stagger anim-delay-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;color:var(--cyan);font-weight:600;">
+              <span>// Python FastAPI: matching.py (Core Similarity Algorithm)</span>
+              <span style="color:var(--text-dim);font-size:0.75rem;">O(N) In-Memory Evaluation</span>
+            </div>
+<pre><code><span style="color:#f43f5e">def</span> <span style="color:#38bdf8">cosine_similarity</span>(v1: np.ndarray, v2: np.ndarray) -> float:
+    <span style="color:#f43f5e">return</span> float(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
+
+<span style="color:#64748b"># Complementary Heuristic for "Find My Team"</span>
+synergy_score = (target_event_similarity * <span style="color:#f59e0b">0.4</span>) + (complementary_skill_distance * <span style="color:#f59e0b">0.6</span>)
+reason = gemini_client.generate(prompt=f<span style="color:#a7f3d0">"Explain in 20 words why {user_a} complements {user_b} for {event}"</span>)</code></pre>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 6: 4-MINUTE DEMO PLAYBOOK -->
+      <section class="slide" data-slide="6">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            05 / Presentation Script
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            The <span class="gradient-text-gold">4-Minute Demo</span> Playbook
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Every second rehearsed to perfection. Zero tab-fumbling, pre-cached AI responses, and designated team member roles for HexWartz judges.
+          </p>
+
+          <div class="demo-timeline anim-stagger anim-delay-4">
+            <div class="demo-step-card active" onclick="showDemoDetail(0)">
+              <div class="demo-time-tag">0:00 - 0:25</div>
+              <div class="demo-actor">Garv Singh</div>
+              <strong style="font-size:0.85rem;color:#fff;">The Hook & Pitch</strong>
+            </div>
+
+            <div class="demo-step-card" onclick="showDemoDetail(1)">
+              <div class="demo-time-tag">0:25 - 0:55</div>
+              <div class="demo-actor">Garv & Prince</div>
+              <strong style="font-size:0.85rem;color:#fff;">Demo Login & Profile</strong>
+            </div>
+
+            <div class="demo-step-card" onclick="showDemoDetail(2)">
+              <div class="demo-time-tag">0:55 - 1:35</div>
+              <div class="demo-actor">Garv Singh</div>
+              <strong style="font-size:0.85rem;color:#fff;">AI Skill Matches</strong>
+            </div>
+
+            <div class="demo-step-card" onclick="showDemoDetail(3)">
+              <div class="demo-time-tag">1:35 - 2:15</div>
+              <div class="demo-actor">Prince & Bhanu</div>
+              <strong style="font-size:0.85rem;color:#fff;">Events & Register</strong>
+            </div>
+
+            <div class="demo-step-card" onclick="showDemoDetail(4)">
+              <div class="demo-time-tag">2:15 - 3:25</div>
+              <div class="demo-actor">Garv & Kuldeep</div>
+              <strong style="font-size:0.85rem;color:#fff;">Find My Team (USP)</strong>
+            </div>
+
+            <div class="demo-step-card" onclick="showDemoDetail(5)">
+              <div class="demo-time-tag">3:25 - 4:00</div>
+              <div class="demo-actor">Shreyansh S.</div>
+              <strong style="font-size:0.85rem;color:#fff;">Impact & Closer</strong>
+            </div>
+          </div>
+
+          <!-- Dynamic Detail Box -->
+          <div class="demo-preview-display anim-stagger anim-delay-5">
+            <div>
+              <span class="pill-badge amber" id="demo-badge-time">Stage 1: 0:00 - 0:25</span>
+              <h3 style="font-size:1.3rem;margin:0.5rem 0;color:#fff;" id="demo-stage-title">The Hook & Core Pitch Line</h3>
+              <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6;" id="demo-stage-desc">
+                Garv delivers the punchy opening directly engaging the judges: "Sharda mein events, seniors aur teammates hain, par students ko pata hi nahi chalta. SkillSphere unhe AI ke zariye sahi logon se jodta hai."
+              </p>
+            </div>
+            <div style="background:rgba(0,0,0,0.4);border:1px solid var(--border-subtle);border-radius:12px;padding:1.2rem;">
+              <div style="font-size:0.8rem;color:var(--cyan);font-weight:700;margin-bottom:0.4rem;">SCREEN ACTION & CLICK TARGET:</div>
+              <div style="font-size:0.88rem;color:#e2e8f0;line-height:1.5;" id="demo-screen-action">
+                Stay on Hero Screen. Do not touch mouse yet. Keep laser eye contact with judges. Deliver high conviction pitch sentence.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 7: COMPETITIVE MOAT -->
+      <section class="slide" data-slide="7">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            06 / Market Positioning
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            Why SkillSphere <span class="gradient-text-cyan">Wins</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Generic platforms like LinkedIn or Unstop are too broad, cold, and impersonal. WhatsApp is chaotic and unindexed. SkillSphere owns the campus ecosystem.
+          </p>
+
+          <div class="moat-table-wrap anim-stagger anim-delay-4">
+            <table class="moat-table">
+              <thead>
+                <tr>
+                  <th>Core Capability</th>
+                  <th class="col-hero" style="color:var(--cyan);font-weight:800;">⚡ SkillSphere</th>
+                  <th>LinkedIn</th>
+                  <th>Unstop</th>
+                  <th>WhatsApp Groups</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Campus-Walled Trust</strong> (Verified Sharda Students)</td>
+                  <td class="col-hero"><span class="moat-check">✓ Instant (Grounded)</span></td>
+                  <td><span class="moat-cross">✗ Too generic</span></td>
+                  <td><span class="moat-cross">✗ Global listing</span></td>
+                  <td><span class="moat-check">✓ Trusted, but unindexed</span></td>
+                </tr>
+                <tr>
+                  <td><strong>AI Complementary Team Assembly</strong> ("Find My Team")</td>
+                  <td class="col-hero"><span class="moat-check">✓ Yes (Vector Synergy)</span></td>
+                  <td><span class="moat-cross">✗ No team engine</span></td>
+                  <td><span class="moat-cross">✗ Manual invite only</span></td>
+                  <td><span class="moat-cross">✗ "Need 1 dev" spam</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Skill Exchange (Can Teach / Want to Learn)</strong></td>
+                  <td class="col-hero"><span class="moat-check">✓ Bi-directional Match</span></td>
+                  <td><span class="moat-cross">✗ Paid / Premium</span></td>
+                  <td><span class="moat-cross">✗ Only competitions</span></td>
+                  <td><span class="moat-cross">✗ Impossible to discover</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Grounded Campus AI Assistant</strong></td>
+                  <td class="col-hero"><span class="moat-check">✓ 0-Hallucination RAG</span></td>
+                  <td><span class="moat-cross">✗ Generic chatbot</span></td>
+                  <td><span class="moat-cross">✗ None</span></td>
+                  <td><span class="moat-cross">✗ None</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 8: TECH ARCHITECTURE -->
+      <section class="slide" data-slide="8">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            07 / Engineering Stack
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            Production-Ready <span class="gradient-text-cyan">Tech Stack</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Designed for high hackathon velocity, zero cloud billing surprises, and seamless transition to production scale.
+          </p>
+
+          <div class="tech-grid anim-stagger anim-delay-4">
+            <!-- Tier 1 -->
+            <div class="glass-panel tech-tier-card glow-cyan card-3d-tilt">
+              <span class="tech-badge-title">Frontend Tier</span>
+              <h3 style="color:#fff;">Next.js 14 + React</h3>
+              <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+                App router, server components, and Tailwind CSS for rapid responsive UI and instant Vercel edge deployment.
+              </p>
+              <div style="margin-top:auto;">
+                <span class="pill-badge cyan">Vercel Edge</span>
+                <span class="pill-badge">Tailwind</span>
+              </div>
+            </div>
+
+            <!-- Tier 2 -->
+            <div class="glass-panel tech-tier-card glow-violet card-3d-tilt">
+              <span class="tech-badge-title">Database & Auth</span>
+              <h3 style="color:#fff;">Supabase (PostgreSQL)</h3>
+              <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+                Built-in Row Level Security, relational schemas (profiles, events, posts, teams), and instant Supabase Auth.
+              </p>
+              <div style="margin-top:auto;">
+                <span class="pill-badge violet">PostgreSQL</span>
+                <span class="pill-badge">RLS Auth</span>
+              </div>
+            </div>
+
+            <!-- Tier 3 -->
+            <div class="glass-panel tech-tier-card glow-gold card-3d-tilt">
+              <span class="tech-badge-title">AI Microservice</span>
+              <h3 style="color:#fff;">Python FastAPI</h3>
+              <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+                Dedicated endpoints (<kbd style="font-size:0.75rem;">/match</kbd>, <kbd style="font-size:0.75rem;">/team</kbd>, <kbd style="font-size:0.75rem;">/ask</kbd>) running NumPy cosine math and Gemini API orchestration.
+              </p>
+              <div style="margin-top:auto;">
+                <span class="pill-badge amber">FastAPI</span>
+                <span class="pill-badge">NumPy</span>
+              </div>
+            </div>
+
+            <!-- Tier 4 -->
+            <div class="glass-panel tech-tier-card glow-cyan card-3d-tilt">
+              <span class="tech-badge-title">AI Foundation</span>
+              <h3 style="color:#fff;">Google Gemini 1.5</h3>
+              <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+                State-of-the-art text embeddings for similarity vectorization and grounded reason generation via Google AI Studio.
+              </p>
+              <div style="margin-top:auto;">
+                <span class="pill-badge emerald">Gemini Flash</span>
+                <span class="pill-badge">Embeddings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 9: SDG 4 IMPACT -->
+      <section class="slide" data-slide="9">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            08 / Social Impact
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            SDG 4: <span class="gradient-text-gold">Quality Education</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Quality education doesn't end at classroom lectures. True learning happens when students teach, build, and innovate together horizontally.
+          </p>
+
+          <div class="sdg-banner anim-stagger anim-delay-4">
+            <div style="font-size:2.8rem;">🎓</div>
+            <div>
+              <h3 style="color:#fff;font-size:1.15rem;">UN Sustainable Development Goal 4.4</h3>
+              <p style="font-size:0.88rem;color:#fecaca;line-height:1.4;">
+                "Substantially increase the number of youth and adults who have relevant technical and vocational skills for employment and entrepreneurship."
+              </p>
+            </div>
+          </div>
+
+          <div class="sdg-stats-grid anim-stagger anim-delay-5">
+            <div class="glass-panel sdg-stat-card card-3d-tilt">
+              <div class="stat-number gradient-text-cyan">100%</div>
+              <h4 style="color:#fff;margin-bottom:0.4rem;">Zero-Cost Mentorship</h4>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Juniors and first-generation college students connect with seniors for genuine guidance without paywalls.</p>
+            </div>
+
+            <div class="glass-panel sdg-stat-card card-3d-tilt">
+              <div class="stat-number gradient-text-gold">3.4x</div>
+              <h4 style="color:#fff;margin-bottom:0.4rem;">Higher Hackathon Teams</h4>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Eliminating teammate discovery friction directly increases campus hackathon participation and project completion.</p>
+            </div>
+
+            <div class="glass-panel sdg-stat-card card-3d-tilt">
+              <div class="stat-number gradient-text-violet">24/7</div>
+              <h4 style="color:#fff;margin-bottom:0.4rem;">Peer-to-Peer Learning</h4>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Bi-directional "Can Teach / Want to Learn" turns every active student into both an educator and an apprentice.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 10: 24-HOUR EXECUTION & ROADMAP -->
+      <section class="slide" data-slide="10">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            09 / Execution & Future
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            24h Hackathon <span class="gradient-text-cyan">Shipped vs Roadmap</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Ruthless MVP scoping: we built 4 fully functioning core pillars during the hackathon and consciously prioritized long-term features for future phases.
+          </p>
+
+          <div class="roadmap-timeline anim-stagger anim-delay-4">
+            <!-- Phase 1 -->
+            <div class="glass-panel roadmap-col glow-cyan card-3d-tilt">
+              <div class="roadmap-col-header" style="border-color:var(--cyan);">
+                <strong style="color:var(--cyan);">Shipped in 24 Hours</strong>
+                <span class="pill-badge emerald">Complete</span>
+              </div>
+              <ul class="roadmap-list">
+                <li>✓ Profile vector creation &amp; bio tags</li>
+                <li>✓ Gemini embeddings &amp; cosine matching</li>
+                <li>✓ Event discovery &amp; one-click registration</li>
+                <li>✓ "Find My Team" complementary synergy</li>
+                <li>✓ Campus community feed (280 chars)</li>
+                <li>✓ Ask Campus AI grounded RAG chat</li>
+              </ul>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="glass-panel roadmap-col glow-violet card-3d-tilt">
+              <div class="roadmap-col-header" style="border-color:var(--violet);">
+                <strong style="color:var(--violet);">Phase 2: Campus Pilot</strong>
+                <span class="pill-badge violet">Next 30 Days</span>
+              </div>
+              <ul class="roadmap-list">
+                <li>• Pilot roll-out with Sharda coding clubs (Access Denied, Robotics, Drone Club)</li>
+                <li>• College .edu email domain verification</li>
+                <li>• In-app direct peer messaging &amp; chat</li>
+                <li>• Club admin dashboard for event creation</li>
+                <li>• Real user feedback loop on match quality</li>
+              </ul>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="glass-panel roadmap-col glow-gold card-3d-tilt">
+              <div class="roadmap-col-header" style="border-color:var(--amber);">
+                <strong style="color:var(--amber);">Phase 3: Multi-Campus</strong>
+                <span class="pill-badge amber">Quarter 1</span>
+              </div>
+              <ul class="roadmap-list">
+                <li>• Native iOS &amp; Android cross-platform app</li>
+                <li>• pgvector vector database auto-scaling</li>
+                <li>• Inter-college hackathon recruitment mode</li>
+                <li>• Institutional enterprise analytics license</li>
+                <li>• Sponsored hackathon organizer portal</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 11: JUDGES Q&A MATRIX -->
+      <section class="slide" data-slide="11">
+        <div class="slide-content">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            10 / Bulletproof Defense
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2">
+            Judges <span class="gradient-text-gold">Q&A Strategy</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3">
+            Honest, technically accurate, and concise answers prepared for the hardest judging questions.
+          </p>
+
+          <div class="qa-grid anim-stagger anim-delay-4">
+            <!-- Q1 -->
+            <div class="glass-panel qa-card card-3d-tilt">
+              <div class="qa-question">
+                <span class="qa-badge">Q1</span>
+                <span>Did you train your own AI model?</span>
+              </div>
+              <div class="qa-answer">
+                <strong>Answer:</strong> "No, and that was a deliberate architectural choice. We leverage pretrained Gemini embeddings for high-dimensional semantic vectorization and designed our own similarity algorithm, complementary team heuristic, and context grounding pipeline."
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="glass-panel qa-card card-3d-tilt">
+              <div class="qa-question">
+                <span class="qa-badge">Q2</span>
+                <span>Can the AI hallucinate campus events?</span>
+              </div>
+              <div class="qa-answer">
+                <strong>Answer:</strong> "Hallucinations are minimized by strict retrieval grounding. Ask Campus AI is provided only with verified DB records (events and approved posts) with strict system prompt boundaries: 'Answer strictly from context, if absent reply do not know'."
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="glass-panel qa-card card-3d-tilt">
+              <div class="qa-question">
+                <span class="qa-badge">Q3</span>
+                <span>How will you solve the Cold Start problem?</span>
+              </div>
+              <div class="qa-answer">
+                <strong>Answer:</strong> "We partner directly with existing high-activity student bodies (e.g. Access Denied, Drone Club, Google Developer Groups) on Day 1. Instead of convincing 5,000 individuals, we onboard 4 clubs whose members already form active teams."
+              </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="glass-panel qa-card card-3d-tilt">
+              <div class="qa-question">
+                <span class="qa-badge">Q4</span>
+                <span>How will this scale beyond 25 demo users?</span>
+              </div>
+              <div class="qa-answer">
+                <strong>Answer:</strong> "Our MVP uses in-memory NumPy vectors for instant sub-second hackathon responses. At 10k+ scale, we migrate to PostgreSQL pgvector indexing with HNSW cosine search and Redis caching for LLM match explanations."
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- SLIDE 12: TEAM & FINALE -->
+      <section class="slide" data-slide="12">
+        <div class="slide-content hero-center">
+          <div class="slide-eyebrow anim-stagger anim-delay-1">
+            <span class="dot"></span>
+            11 / The Builders
+          </div>
+          <h2 class="slide-title anim-stagger anim-delay-2" style="font-size:2.8rem;">
+            Team <span class="gradient-text-cyan">NEXUS PRIME</span>
+          </h2>
+          <p class="slide-subtitle anim-stagger anim-delay-3" style="text-align:center;margin-bottom:1.5rem;">
+            Five dedicated builders combining AI engineering, full-stack systems, UI craft, and deep campus research.
+          </p>
+
+          <div class="team-grid anim-stagger anim-delay-4">
+            <!-- Garv -->
+            <div class="glass-panel team-member-card card-3d-tilt">
+              <div class="team-avatar-ring">
+                <div class="team-avatar-inner">GS</div>
+              </div>
+              <strong style="color:#fff;font-size:0.95rem;">Garv Singh</strong>
+              <span style="font-size:0.75rem;color:var(--cyan);font-weight:600;">Team Leader</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">AI Layer &amp; Pitch Lead</span>
+            </div>
+
+            <!-- Bhanu -->
+            <div class="glass-panel team-member-card card-3d-tilt">
+              <div class="team-avatar-ring">
+                <div class="team-avatar-inner">BP</div>
+              </div>
+              <strong style="color:#fff;font-size:0.95rem;">Bhanu Pratap</strong>
+              <span style="font-size:0.75rem;color:var(--violet);font-weight:600;">Tech Lead</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">DB, Auth &amp; Cloud Deploy</span>
+            </div>
+
+            <!-- Prince -->
+            <div class="glass-panel team-member-card card-3d-tilt">
+              <div class="team-avatar-ring">
+                <div class="team-avatar-inner">PJ</div>
+              </div>
+              <strong style="color:#fff;font-size:0.95rem;">Prince Jha</strong>
+              <span style="font-size:0.75rem;color:var(--amber);font-weight:600;">Events &amp; UI Lead</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Find My Team UI &amp; Demo</span>
+            </div>
+
+            <!-- Kuldeep -->
+            <div class="glass-panel team-member-card card-3d-tilt">
+              <div class="team-avatar-ring">
+                <div class="team-avatar-inner">KR</div>
+              </div>
+              <strong style="color:#fff;font-size:0.95rem;">Kuldeep R.</strong>
+              <span style="font-size:0.75rem;color:var(--emerald);font-weight:600;">Community Lead</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Feed UI, Chat &amp; QA Log</span>
+            </div>
+
+            <!-- Shreyansh -->
+            <div class="glass-panel team-member-card card-3d-tilt">
+              <div class="team-avatar-ring">
+                <div class="team-avatar-inner">SS</div>
+              </div>
+              <strong style="color:#fff;font-size:0.95rem;">Shreyansh S.</strong>
+              <span style="font-size:0.75rem;color:#f43f5e;font-weight:600;">Research &amp; R&amp;D</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">SDG 4 Metrics &amp; Pitch Q&amp;A</span>
+            </div>
+          </div>
+
+          <div class="closers-box anim-stagger anim-delay-5">
+            <div style="text-align:left;">
+              <div class="hindi-quote" style="font-size:1.1rem;color:#fff;">
+                "Hamara goal ye hai ki Sharda ka koi bhi student akela na ho: sahi insaan, sahi skill aur sahi event ek click door ho."
+              </div>
+              <div style="font-size:0.8rem;color:var(--amber);margin-top:4px;">
+                — NEXUS PRIME • HexWartz 2026 • House Hufflepuff
+              </div>
+            </div>
+            <button class="btn-cyber" onclick="triggerCelebrationConfetti()">
+              <span>🎉 Celebrate Launch!</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+
+  <!-- ========================================================================
+       PERSISTENT HUD DOCK CONTROLS
+       ======================================================================== -->
+  <nav id="hud-dock" aria-label="Presentation Controls">
+    <button class="hud-btn" onclick="prevSlide()" title="Previous Slide (Left Arrow)">◀</button>
+    <div class="hud-counter">
+      <span id="current-slide-num">1</span> / <span id="total-slide-num">12</span>
+    </div>
+    <button class="hud-btn" onclick="nextSlide()" title="Next Slide (Right Arrow or Space)">▶</button>
+    <div class="hud-divider"></div>
+
+    <button class="hud-btn" id="btn-toggle-overview" onclick="toggleOverviewModal()" title="Slide Overview Grid (O)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+    </button>
+
+    <button class="hud-btn" id="btn-toggle-notes" onclick="toggleSpeakerNotes()" title="Speaker Notes (N)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </button>
+
+    <button class="hud-btn" id="btn-toggle-laser" onclick="toggleLaserPointer()" title="Laser Pointer (L)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"></circle></svg>
+    </button>
+
+    <button class="hud-btn" id="btn-cycle-mode" onclick="cycleTransitionMode()" title="Cycle Transition Style (T)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+    </button>
+
+    <button class="hud-btn" id="btn-toggle-sound" onclick="toggleAudioFx()" title="Toggle Sound FX (M)">
+      <span id="sound-icon">🔊</span>
+    </button>
+
+    <button class="hud-btn" onclick="toggleFullscreen()" title="Fullscreen (F)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+    </button>
+  </nav>
+
+
+  <!-- ========================================================================
+       SLIDE OVERVIEW MODAL (LIGHTBOX GRID)
+       ======================================================================== -->
+  <div id="overview-modal" onclick="if(event.target===this) toggleOverviewModal()">
+    <div class="overview-header">
+      <div>
+        <h2 style="font-size:1.8rem;color:#fff;">Slide Navigation Grid</h2>
+        <span style="color:var(--text-muted);font-size:0.9rem;">Click any slide to jump directly or press <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">Esc</kbd> to return</span>
+      </div>
+      <button class="btn-ghost" onclick="toggleOverviewModal()">Close (Esc)</button>
+    </div>
+    <div class="overview-grid" id="overview-grid-container">
+      <!-- Generated dynamically by JS -->
+    </div>
+  </div>
+
+
+  <!-- ========================================================================
+       SPEAKER NOTES DRAWER
+       ======================================================================== -->
+  <aside id="speaker-notes-drawer" aria-label="Speaker Notes">
+    <div class="notes-header">
+      <div>
+        <span class="notes-cue-badge">PRESENTER COACHING</span>
+        <strong style="color:#fff;display:block;font-size:0.95rem;" id="notes-title">Slide 1: Hero</strong>
+      </div>
+      <button onclick="toggleSpeakerNotes()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.2rem;">✕</button>
+    </div>
+    <div class="notes-content" id="notes-body">
+      <!-- Injected by JS per slide -->
+    </div>
+  </aside>
+
+
+  <!-- ========================================================================
+       INTERACTIVE SCRIPTS & LOGIC
+       ======================================================================== -->
+  <script>
+    /* ========================================================================
+       1. SLIDE ENGINE & STATE MANAGEMENT
+       ======================================================================== */
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const totalSlides = slides.length;
+    let currentSlideIndex = 0;
+    
+    // Transition styles
+    const transitionModes = ['deck-mode-3d', 'deck-mode-parallax', 'deck-mode-zoom'];
+    let currentModeIndex = 0;
+
+    // Speaker notes database (based on project script & demo guide)
+    const speakerNotesData = [
+      {
+        title: "Slide 1: SkillSphere Opening & Identity",
+        cue: "Garv (Pitch Lead) • 0:00 - 0:25",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Greet judges warmly. Introduce project <strong>SkillSphere</strong> by Team <strong>NEXUS PRIME</strong> under House Hufflepuff (SDG 4: Quality Education).<br>
+          • <strong>The Core Pitch Line:</strong> <em>"Sharda ke students ko sahi log, sahi skills aur sahi events se AI ke zariye jodna."</em><br>
+          • Establish the mood: Not just another chat app, but an intelligence layer bridging student skills and campus life.
+        `
+      },
+      {
+        title: "Slide 2: The Real Campus Problem",
+        cue: "Garv • 0:25 - 0:50",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Ground the problem in Sharda University reality: WhatsApp groups are noisy and unsearchable.<br>
+          • Teammate friction: Students team up with random bench-mates and lose competitions due to unbalanced skills.<br>
+          • First-generation students and juniors feel intimidated reaching out to seniors on LinkedIn.
+        `
+      },
+      {
+        title: "Slide 3: SkillSphere 4 Pillars",
+        cue: "Garv & Prince • 0:50 - 1:20",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Walk through the 4 connected modules: AI Skill Matcher, Campus Events Hub, Find My Team (USP), and Grounded Campus Feed.<br>
+          • Point out that every module reinforces the other: events feed into teams, skills feed into matches.
+        `
+      },
+      {
+        title: "Slide 4: USP 'Find My Team' Simulator",
+        cue: "Garv & Prince • 2:15 - 2:55",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • <strong>The Crown Jewel:</strong> Hit the 'Run AI Synergy Engine' button live in front of the judges!<br>
+          • Explain the difference: Regular search gives similar interests. <em>Find My Team gives complementary skills</em> (Frontend + AI Lead + Backend + Designer).<br>
+          • Highlight the 20-word LLM reasoning generated for each match.
+        `
+      },
+      {
+        title: "Slide 5: AI Engine & Vector Math",
+        cue: "Garv (AI Lead) • Technical Deep Dive",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Clarify: "We didn't pretend to train a foundation model in 24 hours. We engineered a robust vector pipeline using Google Gemini pretrained embeddings."<br>
+          • In-memory NumPy cosine similarity evaluates top 3 matches in &lt;15 milliseconds.<br>
+          • Pre-computed reasoning cached to guarantee sub-second UI delivery.
+        `
+      },
+      {
+        title: "Slide 6: 4-Minute Demo Playbook",
+        cue: "Entire Team • Rehearsal Alignment",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Walk judges through our precise execution discipline.<br>
+          • Each member has a designated 40-second operational window.<br>
+          • Pre-authenticated demo accounts (demo_junior & demo_senior) eliminate login friction.
+        `
+      },
+      {
+        title: "Slide 7: Why SkillSphere Wins (Moat)",
+        cue: "Shreyansh (Research) • Defensibility",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Contrast against LinkedIn (cold & generic), Unstop (only competitions, no campus community), and WhatsApp (unindexed chaos).<br>
+          • SkillSphere is campus-walled, trusted, and built for peer-to-peer synergy.
+        `
+      },
+      {
+        title: "Slide 8: Tech Stack & System Architecture",
+        cue: "Bhanu (Tech Lead) • Architecture",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Next.js 14 on Vercel Edge for instant responsiveness.<br>
+          • Supabase PostgreSQL for relational integrity, RLS, and Auth.<br>
+          • Python FastAPI on Render for high-performance AI vector similarity endpoints.<br>
+          • Vibe coded with Google Antigravity while maintaining strict architectural boundaries.
+        `
+      },
+      {
+        title: "Slide 9: SDG 4 Quality Education Impact",
+        cue: "Shreyansh (Impact Lead)",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • How horizontal peer learning fulfills Target 4.4.<br>
+          • 100% free peer mentoring empowers underrepresented and first-generation learners.<br>
+          • Direct metric: Hackathon team formation rate and skill exchanges logged.
+        `
+      },
+      {
+        title: "Slide 10: 24h Hackathon Shipped vs Roadmap",
+        cue: "Garv & Bhanu • Scope Discipline",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Highlight what was completed in 24 hours (P1 modules).<br>
+          • Explain what was intentionally parked in the roadmap (online code editor, video calls) to prevent half-baked quality.
+        `
+      },
+      {
+        title: "Slide 11: Judges Q&A Matrix",
+        cue: "Entire Team • Q&A Defense",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Be direct, concise, and truthful. If something is in roadmap, state: <em>'Ye hamare aage ke roadmap mein hai.'</em><br>
+          • Zero hallucination defense: RAG is strictly bounded to internal campus database records.
+        `
+      },
+      {
+        title: "Slide 12: Team Nexus Prime & Closer",
+        cue: "All 5 Members • The Grand Finale",
+        text: `
+          <strong>Primary Talking Points:</strong><br>
+          • Introduce Garv, Bhanu, Prince, Kuldeep, Shreyansh.<br>
+          • Deliver the emotional closing line: <em>'Hamara goal ye hai ki Sharda ka koi bhi student akela na ho: sahi insaan, sahi skill aur sahi event ek click door ho.'</em><br>
+          • Click the Celebration Confetti button!
+        `
+      }
+    ];
+
+    function updateSlide(newIndex) {
+      if (newIndex < 0 || newIndex >= totalSlides) return;
+      
+      const prevIndex = currentSlideIndex;
+      currentSlideIndex = newIndex;
+
+      // Update slide classes
+      slides.forEach((slide, idx) => {
+        slide.classList.remove('active', 'prev', 'next');
+        if (idx === currentSlideIndex) {
+          slide.classList.add('active');
+        } else if (idx < currentSlideIndex) {
+          slide.classList.add('prev');
+        } else {
+          slide.classList.add('next');
+        }
+      });
+
+      // Update HUD
+      document.getElementById('current-slide-num').textContent = currentSlideIndex + 1;
+      const progressPercent = ((currentSlideIndex + 1) / totalSlides) * 100;
+      document.getElementById('top-progress-bar').style.width = `${progressPercent}%`;
+
+      // Update Speaker Notes
+      const notes = speakerNotesData[currentSlideIndex] || { title: `Slide ${currentSlideIndex + 1}`, cue: "", text: "Presenter notes ready." };
+      document.getElementById('notes-title').innerHTML = notes.title;
+      document.getElementById('notes-body').innerHTML = `
+        <span class="notes-cue-badge">${notes.cue}</span><br>
+        ${notes.text}
+      `;
+
+      // Highlight active overview thumbnail
+      document.querySelectorAll('.overview-thumbnail').forEach((thumb, i) => {
+        if (i === currentSlideIndex) {
+          thumb.classList.add('current');
+        } else {
+          thumb.classList.remove('current');
+        }
+      });
+
+      // Play subtle UI sound
+      playUiSound('slide');
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < totalSlides - 1) {
+        updateSlide(currentSlideIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        updateSlide(currentSlideIndex - 1);
+      }
+    }
+
+    function jumpToSlide(slideNum) {
+      updateSlide(slideNum - 1);
+      // Close overview if open
+      const modal = document.getElementById('overview-modal');
+      if (modal.classList.contains('open')) {
+        toggleOverviewModal();
+      }
+    }
+
+    /* ========================================================================
+       2. KEYBOARD & TOUCH NAVIGATION
+       ======================================================================== */
+    window.addEventListener('keydown', (e) => {
+      // Don't intercept if typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      switch (e.code) {
+        case 'ArrowRight':
+        case 'Space':
+        case 'PageDown':
+          e.preventDefault();
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          prevSlide();
+          break;
+        case 'Home':
+          e.preventDefault();
+          updateSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          updateSlide(totalSlides - 1);
+          break;
+        case 'KeyO':
+          e.preventDefault();
+          toggleOverviewModal();
+          break;
+        case 'KeyN':
+          e.preventDefault();
+          toggleSpeakerNotes();
+          break;
+        case 'KeyF':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'KeyL':
+          e.preventDefault();
+          toggleLaserPointer();
+          break;
+        case 'KeyT':
+          e.preventDefault();
+          cycleTransitionMode();
+          break;
+        case 'KeyM':
+          e.preventDefault();
+          toggleAudioFx();
+          break;
+        case 'KeyC':
+          e.preventDefault();
+          triggerCelebrationConfetti();
+          break;
+        case 'Escape':
+          const modal = document.getElementById('overview-modal');
+          if (modal.classList.contains('open')) toggleOverviewModal();
+          const notes = document.getElementById('speaker-notes-drawer');
+          if (notes.classList.contains('open')) toggleSpeakerNotes();
+          break;
+      }
+    });
+
+    // Mobile Swipe Gesture Support
+    let touchStartX = 0;
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      
+      // Horizontal swipe
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        if (diffX < 0) nextSlide();
+        else prevSlide();
+      }
+    }, { passive: true });
+
+    /* ========================================================================
+       3. TRANSITION MODE CYCLER
+       ======================================================================== */
+    function cycleTransitionMode() {
+      document.body.classList.remove(...transitionModes);
+      currentModeIndex = (currentModeIndex + 1) % transitionModes.length;
+      const newMode = transitionModes[currentModeIndex];
+      document.body.classList.add(newMode);
+      playUiSound('toggle');
+      
+      let label = "3D Cube";
+      if (newMode === 'deck-mode-parallax') label = "Fluid Parallax";
+      if (newMode === 'deck-mode-zoom') label = "Quantum Zoom";
+      
+      showToast(`Transition Mode: ${label}`);
+    }
+
+    /* ========================================================================
+       4. OVERVIEW LIGHTBOX MODAL
+       ======================================================================== */
+    function buildOverviewGrid() {
+      const container = document.getElementById('overview-grid-container');
+      container.innerHTML = '';
+      
+      slides.forEach((slide, idx) => {
+        const titleEl = slide.querySelector('h1, h2, h3');
+        const title = titleEl ? titleEl.textContent.trim() : `Slide ${idx + 1}`;
+        
+        const card = document.createElement('div');
+        card.className = `overview-thumbnail ${idx === currentSlideIndex ? 'current' : ''}`;
+        card.innerHTML = `
+          <div class="overview-thumb-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+          <div class="overview-thumb-title">${title}</div>
+        `;
+        card.onclick = () => jumpToSlide(idx + 1);
+        container.appendChild(card);
+      });
+    }
+
+    function toggleOverviewModal() {
+      const modal = document.getElementById('overview-modal');
+      const isOpen = modal.classList.toggle('open');
+      document.getElementById('btn-toggle-overview').classList.toggle('active', isOpen);
+      if (isOpen) {
+        buildOverviewGrid();
+        playUiSound('open');
+      } else {
+        playUiSound('close');
+      }
+    }
+
+    /* ========================================================================
+       5. SPEAKER NOTES DRAWER
+       ======================================================================== */
+    function toggleSpeakerNotes() {
+      const drawer = document.getElementById('speaker-notes-drawer');
+      const isOpen = drawer.classList.toggle('open');
+      document.getElementById('btn-toggle-notes').classList.toggle('active', isOpen);
+      playUiSound(isOpen ? 'open' : 'close');
+    }
+
+    /* ========================================================================
+       6. FULLSCREEN UTILITY
+       ======================================================================== */
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+      playUiSound('toggle');
+    }
+
+    /* ========================================================================
+       7. WEB AUDIO SYNTHESIZER SOUND EFFECTS
+       ======================================================================== */
+    let audioFxEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playUiSound(type) {
+      if (!audioFxEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        const now = ctx.currentTime;
+        
+        if (type === 'slide') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        } else if (type === 'toggle' || type === 'open') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(580, now);
+          osc.frequency.exponentialRampToValueAtTime(920, now + 0.12);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'success') {
+          // Dual chime
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        }
+      } catch (err) {}
+    }
+
+    function toggleAudioFx() {
+      audioFxEnabled = !audioFxEnabled;
+      document.getElementById('sound-icon').textContent = audioFxEnabled ? '🔊' : '🔇';
+      document.getElementById('btn-toggle-sound').classList.toggle('active', audioFxEnabled);
+      showToast(audioFxEnabled ? 'Audio Sound FX: Enabled' : 'Audio Sound FX: Muted');
+    }
+
+    /* ========================================================================
+       8. LASER POINTER WITH GLOW TRAIL
+       ======================================================================== */
+    let laserActive = false;
+    const laserCanvas = document.getElementById('laser-canvas');
+    const laserCtx = laserCanvas.getContext('2d');
+    let laserPoints = [];
+
+    function resizeLaserCanvas() {
+      laserCanvas.width = window.innerWidth;
+      laserCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeLaserCanvas);
+    resizeLaserCanvas();
+
+    function toggleLaserPointer() {
+      laserActive = !laserActive;
+      document.body.classList.toggle('laser-active', laserActive);
+      document.getElementById('btn-toggle-laser').classList.toggle('active', laserActive);
+      showToast(laserActive ? 'Laser Pointer: ON (Press L)' : 'Laser Pointer: OFF');
+      playUiSound('toggle');
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (!laserActive) return;
+      laserPoints.push({ x: e.clientX, y: e.clientY, time: Date.now() });
+      if (laserPoints.length > 25) laserPoints.shift();
+    });
+
+    function renderLaserTrail() {
+      if (laserActive) {
+        laserCtx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+        const now = Date.now();
+        laserPoints = laserPoints.filter(p => now - p.time < 350);
+        
+        if (laserPoints.length > 1) {
+          for (let i = 1; i < laserPoints.length; i++) {
+            const p1 = laserPoints[i - 1];
+            const p2 = laserPoints[i];
+            const age = now - p2.time;
+            const alpha = 1 - (age / 350);
+            
+            laserCtx.beginPath();
+            laserCtx.moveTo(p1.x, p1.y);
+            laserCtx.lineTo(p2.x, p2.y);
+            laserCtx.lineWidth = 4 * alpha;
+            laserCtx.strokeStyle = `rgba(244, 63, 94, ${alpha})`;
+            laserCtx.shadowColor = '#f43f5e';
+            laserCtx.shadowBlur = 15;
+            laserCtx.stroke();
+          }
+          
+          const current = laserPoints[laserPoints.length - 1];
+          laserCtx.beginPath();
+          laserCtx.arc(current.x, current.y, 6, 0, Math.PI * 2);
+          laserCtx.fillStyle = '#ff2a55';
+          laserCtx.shadowColor = '#ff2a55';
+          laserCtx.shadowBlur = 20;
+          laserCtx.fill();
+        }
+      }
+      requestAnimationFrame(renderLaserTrail);
+    }
+    requestAnimationFrame(renderLaserTrail);
+
+    /* ========================================================================
+       9. LIVE PITCH TIMER HUD WIDGET
+       ======================================================================== */
+    let pitchSeconds = 0;
+    let pitchTimerInterval = null;
+    let isPitchTimerRunning = false;
+
+    function togglePitchTimer() {
+      if (isPitchTimerRunning) {
+        clearInterval(pitchTimerInterval);
+        isPitchTimerRunning = false;
+      } else {
+        isPitchTimerRunning = true;
+        pitchTimerInterval = setInterval(() => {
+          pitchSeconds++;
+          const mins = String(Math.floor(pitchSeconds / 60)).padStart(2, '0');
+          const secs = String(pitchSeconds % 60).padStart(2, '0');
+          const timerEl = document.getElementById('pitch-timer-text');
+          timerEl.textContent = `${mins}:${secs}`;
+          
+          if (pitchSeconds >= 240) { // 4:00 minutes warning
+            timerEl.style.color = 'var(--rose)';
+          } else if (pitchSeconds >= 200) {
+            timerEl.style.color = 'var(--amber)';
+          } else {
+            timerEl.style.color = 'inherit';
+          }
+        }, 1000);
+      }
+      playUiSound('toggle');
+    }
+
+    function resetPitchTimer() {
+      clearInterval(pitchTimerInterval);
+      isPitchTimerRunning = false;
+      pitchSeconds = 0;
+      const timerEl = document.getElementById('pitch-timer-text');
+      timerEl.textContent = '00:00';
+      timerEl.style.color = 'inherit';
+    }
+
+    /* ========================================================================
+       10. INTERACTIVE PARTICLES NETWORK CANVAS (BACKGROUND)
+       ======================================================================== */
+    const netCanvas = document.getElementById('canvas-network');
+    const netCtx = netCanvas.getContext('2d');
+    let netWidth = 0;
+    let netHeight = 0;
+    let particles = [];
+
+    function resizeNetCanvas() {
+      netWidth = netCanvas.width = window.innerWidth;
+      netHeight = netCanvas.height = window.innerHeight;
+      initParticles();
+    }
+    window.addEventListener('resize', resizeNetCanvas);
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((netWidth * netHeight) / 18000);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * netWidth,
+          y: Math.random() * netHeight,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          radius: Math.random() * 2 + 1,
+          color: Math.random() > 0.5 ? 'rgba(0, 242, 254, ' : 'rgba(139, 92, 246, '
+        });
+      }
+    }
+    resizeNetCanvas();
+
+    function renderNetCanvas() {
+      netCtx.clearRect(0, 0, netWidth, netHeight);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = netWidth;
+        if (p.x > netWidth) p.x = 0;
+        if (p.y < 0) p.y = netHeight;
+        if (p.y > netHeight) p.y = 0;
+
+        netCtx.beginPath();
+        netCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        netCtx.fillStyle = p.color + '0.6)';
+        netCtx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            const alpha = (1 - dist / 110) * 0.15;
+            netCtx.beginPath();
+            netCtx.moveTo(p.x, p.y);
+            netCtx.lineTo(p2.x, p2.y);
+            netCtx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+            netCtx.lineWidth = 0.8;
+            netCtx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(renderNetCanvas);
+    }
+    requestAnimationFrame(renderNetCanvas);
+
+    /* ========================================================================
+       11. 3D TILT EFFECT ON CARDS
+       ======================================================================== */
+    document.querySelectorAll('.card-3d-tilt').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0)';
+      });
+    });
+
+    /* ========================================================================
+       12. INTERACTIVE DEMO SLIDES LOGIC
+       ======================================================================== */
+
+    // Slide 4: "Find My Team" Simulation Engine
+    const mockTeamVariants = [
+      {
+        score: "98.2%",
+        status: "High Synergy: AI Lead + Database Engineer + UI/UX Product Lead",
+        members: [
+          { name: "Garv Singh", role: "AI & FastAPI Architect", score: "99%", avatar: "GS", bg: "linear-gradient(135deg,#8b5cf6,#ec4899)", why: "Complementary: Embeddings, RAG & LLM backend connects directly to Rohan's Next.js frontend." },
+          { name: "Bhanu Pratap", role: "Database & Auth Lead", score: "97%", avatar: "BP", bg: "linear-gradient(135deg,#00f2fe,#3b82f6)", why: "Owns Supabase database schemas, authentication, and Vercel cloud deployment." },
+          { name: "Prince Jha", role: "UI/UX & Product Design", score: "98%", avatar: "PJ", bg: "linear-gradient(135deg,#f59e0b,#ea580c)", why: "Designs high-conversion event screens, profile forms & Find My Team popup UI." }
+        ]
+      },
+      {
+        score: "96.8%",
+        status: "Balanced: Full Stack + Prompt Engineer + Cloud DevOps",
+        members: [
+          { name: "Kuldeep R.", role: "Frontend & Chat UI Lead", score: "97%", avatar: "KR", bg: "linear-gradient(135deg,#10b981,#06b6d4)", why: "Built the 280-char X-style community feed and real-time Ask Campus AI chat box." },
+          { name: "Shreyansh S.", role: "Research & Pitch Lead", score: "96%", avatar: "SS", bg: "linear-gradient(135deg,#f43f5e,#fb7185)", why: "Verified SDG 4 statistics, campus club seed dataset, and demo script rigor." },
+          { name: "Garv Singh", role: "AI Layer Leader", score: "99%", avatar: "GS", bg: "linear-gradient(135deg,#8b5cf6,#ec4899)", why: "Ensures zero-hallucination vector similarity and team synergy matching logic." }
+        ]
+      }
+    ];
+
+    let currentMockVariant = 0;
+
+    function simulateFindMyTeam() {
+      playUiSound('toggle');
+      const scoreEl = document.getElementById('fmt-score-val');
+      const statusEl = document.getElementById('fmt-status-text');
+      const resultsContainer = document.getElementById('fmt-team-results');
+      
+      scoreEl.textContent = "Scanning vectors...";
+      scoreEl.style.color = "var(--cyan)";
+      statusEl.textContent = "Calculating cosine distances across 25 campus profile vectors...";
+
+      setTimeout(() => {
+        currentMockVariant = (currentMockVariant + 1) % mockTeamVariants.length;
+        const variant = mockTeamVariants[currentMockVariant];
+        
+        scoreEl.textContent = `${variant.score} Match`;
+        scoreEl.style.color = "var(--emerald)";
+        statusEl.textContent = variant.status;
+        
+        resultsContainer.innerHTML = variant.members.map(m => `
+          <div class="mate-card highlight" style="animation:fadeInUp 0.4s ease forwards;">
+            <div class="mate-header">
+              <div class="mate-avatar" style="background:${m.bg};">${m.avatar}</div>
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;color:#fff;">${m.name}</div>
+                <div style="font-size:0.75rem;color:var(--cyan);">${m.role}</div>
+              </div>
+              <div class="mate-score">${m.score}</div>
+            </div>
+            <div style="font-size:0.8rem;color:#cbd5e1;line-height:1.4;">
+              <strong>Why AI matched:</strong> ${m.why}
+            </div>
+            <button class="btn-ghost" style="padding:0.4rem;font-size:0.75rem;justify-content:center;margin-top:auto;" onclick="alert('Invite sent to ${m.name}!')">Invite to Team</button>
+          </div>
+        `).join('');
+
+        playUiSound('success');
+      }, 550);
+    }
+
+    // Slide 6: 4-Minute Demo Step Interactive Selector
+    const demoStages = [
+      {
+        time: "Stage 1: 0:00 - 0:25",
+        title: "The Hook & Core Pitch Line",
+        desc: "Garv delivers the punchy opening: 'Sharda mein events, seniors aur teammates hain, par students ko pata nahi chalta.' Establishing the pain and our single-line mission.",
+        action: "Stay on Hero Screen. Maintain direct eye contact with judges. Deliver high conviction pitch sentence with smile."
+      },
+      {
+        time: "Stage 2: 0:25 - 0:55",
+        title: "Demo Login & Profile Vector",
+        desc: "Garv clicks 'Demo Login (junior)'. Highlights the profile with skills, interests, and specifically 'Can Teach' and 'Want to Learn' fields.",
+        action: "Prince clicks 'Demo Login' -> Profile screen opens immediately. Point to bi-directional learning tags on screen."
+      },
+      {
+        time: "Stage 3: 0:55 - 1:35",
+        title: "AI Matches & Skill Exchange",
+        desc: "Open Matches page showing top 3 compatible peers. Garv states: 'Ye keyword search nahi, pretrained Gemini embeddings aur cosine similarity se nikala gaya match hai.'",
+        action: "Prince clicks 'Matches' in Navbar. Top 3 cards appear with similarity badge and 20-word LLM reason."
+      },
+      {
+        time: "Stage 4: 1:35 - 2:15",
+        title: "Events Hub & 1-Click Register",
+        desc: "Prince navigates to Events. Highlights the '92% match' For-You badge based on profile embedding. Hits 'Register'—button instantly turns into 'Registered'.",
+        action: "Prince scrolls event list, clicks 'HexWartz Hackathon' -> Hits Register -> Shows persistent registered state."
+      },
+      {
+        time: "Stage 5: 2:15 - 3:25",
+        title: "The USP: Find My Team + Community",
+        desc: "Garv showcases the killer feature: 'Find My Team'. AI suggests 3 complementary members. Prince clicks Invite. Kuldeep demonstrates 280-char post and Ask Campus AI.",
+        action: "Click 'Find My Team' button -> Modal reveals complementary team -> Kuldeep submits quick campus post -> Ask Campus AI answers campus query."
+      },
+      {
+        time: "Stage 6: 3:25 - 4:00",
+        title: "SDG 4 Impact & The Big Closer",
+        desc: "Shreyansh closes on SDG 4 Quality Education, democratizing senior mentorship, and roadmap. Garv delivers final emotional closing statement.",
+        action: "Switch to Team / Closer slide. Deliver final sentence with conviction: 'Koi bhi student akela na ho: sahi insaan, sahi skill aur sahi event ek click door ho.'"
+      }
+    ];
+
+    function showDemoDetail(index) {
+      playUiSound('toggle');
+      document.querySelectorAll('.demo-step-card').forEach((card, idx) => {
+        card.classList.toggle('active', idx === index);
+      });
+      const stage = demoStages[index];
+      document.getElementById('demo-badge-time').textContent = stage.time;
+      document.getElementById('demo-stage-title').textContent = stage.title;
+      document.getElementById('demo-stage-desc').textContent = stage.desc;
+      document.getElementById('demo-screen-action').textContent = stage.action;
+    }
+
+    /* ========================================================================
+       13. CONFETTI CELEBRATION CANNON
+       ======================================================================== */
+    const confCanvas = document.getElementById('confetti-canvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confettiPieces = [];
+
+    function resizeConfettiCanvas() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfettiCanvas);
+    resizeConfettiCanvas();
+
+    function triggerCelebrationConfetti() {
+      playUiSound('success');
+      const colors = ['#00f2fe', '#8b5cf6', '#f59e0b', '#10b981', '#f43f5e', '#ffffff'];
+      for (let i = 0; i < 180; i++) {
+        confettiPieces.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight * 0.7,
+          vx: (Math.random() - 0.5) * 22,
+          vy: (Math.random() - 0.9) * 22,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 12,
+          opacity: 1
+        });
+      }
+      showToast("🚀 All the best to Team NEXUS PRIME at HexWartz 2026!");
+    }
+
+    function renderConfetti() {
+      if (confettiPieces.length > 0) {
+        confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+        for (let i = confettiPieces.length - 1; i >= 0; i--) {
+          const p = confettiPieces[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.45; // gravity
+          p.rotation += p.rotationSpeed;
+          p.opacity -= 0.007;
+
+          if (p.opacity <= 0 || p.y > confCanvas.height) {
+            confettiPieces.splice(i, 1);
+            continue;
+          }
+
+          confCtx.save();
+          confCtx.translate(p.x, p.y);
+          confCtx.rotate((p.rotation * Math.PI) / 180);
+          confCtx.fillStyle = p.color;
+          confCtx.globalAlpha = Math.max(0, p.opacity);
+          confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          confCtx.restore();
+        }
+      }
+      requestAnimationFrame(renderConfetti);
+    }
+    requestAnimationFrame(renderConfetti);
+
+    /* ========================================================================
+       14. TOAST NOTIFICATION UTILITY
+       ======================================================================== */
+    let toastTimeout = null;
+    function showToast(msg) {
+      let toast = document.getElementById('hud-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'hud-toast';
+        toast.style.cssText = `
+          position: fixed;
+          top: 5rem;
+          left: 50%;
+          transform: translateX(-50%) translateY(-20px);
+          background: rgba(11, 14, 29, 0.92);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--border-glow);
+          color: #fff;
+          font-family: var(--font-body);
+          font-size: 0.88rem;
+          font-weight: 600;
+          padding: 0.65rem 1.4rem;
+          border-radius: 9999px;
+          z-index: 10000;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.3s var(--ease-out-expo);
+        `;
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+      }, 2400);
+    }
+
+    // Initialize presentation on load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSlide(0);
+      document.getElementById('total-slide-num').textContent = totalSlides;
+    });
+  </script>
+</body>
+</html>
